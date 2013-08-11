@@ -1,4 +1,4 @@
-Sprocket.registerPlugin('core/dom', [], function() {
+Sprocket.registerModule('core/dom', [], function() {
 	'use strict';
 
 	var dom = function(query) {

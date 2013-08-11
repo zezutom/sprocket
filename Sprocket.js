@@ -2,7 +2,7 @@
 	'use strict';
 
 	var signalsList = {};
-	var plugins = {};
+	var modules = {};
 	var baseDir = '';
 
 	function Sprocket() {
@@ -32,7 +32,7 @@
 		return (typeof obj !== 'undefined' && obj !== null);
 	}
 
-	function newPlugin(vals) {
+	function newModule(vals) {
 		var data = {
 			loading: false,
 			loadingListeners: [],
@@ -95,39 +95,39 @@
 		});
 	};
 
-	Sprocket.prototype.loadPlugin = function(plugin, callback) {
-		var doLoad = function(plugin, callback) {
-			var pluginId, pluginFile;
+	Sprocket.prototype.loadModule = function(module, callback) {
+		var doLoad = function(module, callback) {
+			var moduleId, moduleFile;
 
-			if (plugin.search(/^core\//) > -1) {
-				pluginId = plugin;
-				pluginFile = baseDir + plugin + '.js';
+			if (module.search(/^core\//) > -1) {
+				moduleId = module;
+				moduleFile = baseDir + module + '.js';
 			} else {
-				pluginId = plugin;
-				pluginFile = plugin + '.js';
+				moduleId = module;
+				moduleFile = module + '.js';
 			}
 
-			if (exists(plugins[pluginId])) {
-				if (plugins[pluginId].loading) {
-					plugins[pluginId].loadingListeners.push(callback);
+			if (exists(modules[moduleId])) {
+				if (modules[moduleId].loading) {
+					modules[moduleId].loadingListeners.push(callback);
 					return;
 				}
 				if (exists(callback)) {
-					callback(plugins[pluginId]);
+					callback(modules[moduleId]);
 				}
 				return;
 			}
 
-			plugins[pluginId] = (function(id, filePath, doneCB) {
+			modules[moduleId] = (function(id, filePath, doneCB) {
 				var head = document.querySelectorAll('head')[0];
 				var script = document.createElement('script');
 
 				script.addEventListener('load', function() {
-					var plugin = plugins[pluginId];
-					if (!plugin.depsLoading) {
-						plugin.loading = false;
-						for (var t = 0; t < plugin.loadingListeners.length; t++) {
-							plugin.loadingListeners[t](plugin);
+					var module = modules[moduleId];
+					if (!module.depsLoading) {
+						module.loading = false;
+						for (var t = 0; t < module.loadingListeners.length; t++) {
+							module.loadingListeners[t](module);
 						}
 					}
 				}, true);
@@ -135,85 +135,85 @@
 
 				head.appendChild(script);
 
-				return newPlugin({
+				return newModule({
 					loading: true,
 					loadingListeners: exists(doneCB) ? [doneCB] : []
 				});
-			}) (pluginId, pluginFile, callback);
+			}) (moduleId, moduleFile, callback);
 		};
 
-		if (isArray(plugin)) {
-			(function(plugins, doneCB) {
+		if (isArray(module)) {
+			(function(modules, doneCB) {
 				var counter = 0;
-				var pluginList = [];
-				var callback = function(plugin) {
+				var moduleList = [];
+				var callback = function(module) {
 					counter++;
-					pluginList.push(plugin.data);
+					moduleList.push(module.data);
 
-					if (counter >= plugins.length) {
+					if (counter >= modules.length) {
 						if (isFunction(doneCB)) {
-							doneCB.apply(null, pluginList);
+							doneCB.apply(null, moduleList);
 						}
 					}
 				};
-				for (var t = 0; t < plugins.length; t++) {
-					doLoad(plugins[t], callback);
+				for (var t = 0; t < modules.length; t++) {
+					doLoad(modules[t], callback);
 				}
-			})(plugin, callback);
+			})(module, callback);
 		} else {
-			doLoad(plugin, function(plugin) {
+			doLoad(module, function(module) {
 				if (isFunction(callback)) {
-					callback(plugin.data);
+					callback(module.data);
 				}
 			});
 		}
 	};
 
-	Sprocket.prototype.requirePlugin = function(plugin) {
-		if (!exists(plugins[plugin])) {
-			console.error('Sprocket: Plugin \'' + plugin + '\' does not exist.');
+	Sprocket.prototype.requireModule = function(module) {
+		if (!exists(modules[module])) {
+			console.error('Sprocket: module \'' + module + '\' does not exist.');
 			return;
 		}
 
-		if (plugins[plugin].loading) {
-			console.warn('Sprocket: Plugin \'' + plugin + '\' is not yet loaded.');
+		if (modules[module].loading) {
+			console.warn('Sprocket: module \'' + module + '\' is not yet loaded.');
 		}
 
-		return plugins[plugin].data;
+		return modules[module].data;
 	};
 
-	Sprocket.prototype.registerPlugin = function(id, dependencies, initialize) {
+	Sprocket.prototype.registerModule = function(id, dependencies, initialize) {
 		if (!isString(id)) {
-			console.error('Sprocket: Invalid plugin id.');
+			console.error('Sprocket: Invalid module id.');
 			return;
 		}
 
 		if (!isFunction(initialize)) {
-			console.error('Sprocket: Undefined or invalid plugin function.');
+			console.error('Sprocket: Undefined or invalid module function.');
 			return;
 		}
 
-		if (exists(plugins[id]) && !plugins[id].loading) {
+		if (exists(modules[id]) && !modules[id].loading) {
 			console.error('Sprocket: Namespace \'' + id + '\' already taken.');
 			return;
 		}
 
-		if (!exists(plugins[id])) {
-			plugins[id] = newPlugin();
+		if (!exists(modules[id])) {
+			modules[id] = newModule();
 		}
 
 		if (isArray(dependencies) && dependencies.length > 0) {
-			plugins[id].depsLoading = true;
-			this.loadPlugin(dependencies, function() {
-				plugins[id].data = initialize.apply(null, arguments);
+			modules[id].depsLoading = true;
+			this.loadModule(dependencies, function() {
+				modules[id].data = initialize.apply(null, arguments);
 
-				plugins[id].depsLoading = false;
-				for (var t = 0; t < plugins[id].loadingListeners.length; t++) {
-					plugins[id].loadingListeners[t](plugins[id]);
+				modules[id].depsLoading = false;
+				for (var t = 0; t < modules[id].loadingListeners.length; t++) {
+					modules[id].loadingListeners[t](modules[id]);
 				}
 			});
 		} else {
-			plugins[id].data = initialize() || null;
+			modules[id].data = initialize() || null;
 		}
 	};
 

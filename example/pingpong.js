@@ -1,4 +1,4 @@
-Sprocket.registerPlugin('pingpong', ['ping', 'pong'], function(ping, pong) {
+Sprocket.registerModule('pingpong', ['ping', 'pong'], function(ping, pong) {
 	'use strict';
 
 	console.log(ping, pong);

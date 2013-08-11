@@ -7,16 +7,16 @@
 	<script src="../Sprocket.js" data-base-dir="../"></script>
 
 	<script>
-	Sprocket.loadPlugin('pingpong', function() {
+	Sprocket.loadModule('pingpong', function() {
 		console.log('PingPong loaded callback');
 	});
 
-	Sprocket.registerPlugin('ponger', ['pingpong'], function(pingpong) {
+	Sprocket.registerModule('ponger', ['pingpong'], function(pingpong) {
 		console.log('ponger here');
 		console.log(pingpong);
 	});
 
-	Sprocket.loadPlugin('core/dom', function(dom) {
+	Sprocket.loadModule('core/dom', function(dom) {
 		dom('<div>')
 		.style({
 			backgroundColor: '#9999FF',

@@ -1,4 +1,4 @@
-Sprocket.registerPlugin('ping', [], function() {
+Sprocket.registerModule('ping', [], function() {
 	'use strict';
 
 	function ping() {
