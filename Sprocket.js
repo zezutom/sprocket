@@ -151,7 +151,7 @@
 					pluginList.push(plugin.data);
 
 					if (counter >= plugins.length) {
-						if (exists(doneCB)) {
+						if (isFunction(doneCB)) {
 							doneCB.apply(null, pluginList);
 						}
 					}
@@ -162,7 +162,9 @@
 			})(plugin, callback);
 		} else {
 			doLoad(plugin, function(plugin) {
-				callback(plugin.data);
+				if (isFunction(callback)) {
+					callback(plugin.data);
+				}
 			});
 		}
 	};
