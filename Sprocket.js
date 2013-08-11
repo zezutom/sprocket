@@ -83,10 +83,8 @@
 
 	// Sends data to anyone who is listening.
 	Sprocket.prototype.sendSignal = function(signalId, data) {
-		console.log('Signal sent', signalId);
-
 		if (typeof signalsList[signalId] === 'undefined') {
-			console.warn('Sprocket: No one\'s listening...');
+			console.warn('Sprocket: No one\'s listening for \'' + signalId + '\'...');
 			return;
 		}
 
@@ -95,7 +93,7 @@
 		});
 	};
 
-	Sprocket.prototype.loadModule = function(module, callback) {
+	Sprocket.prototype.require = function(module, callback) {
 		var doLoad = function(module, callback) {
 			var moduleId, moduleFile;
 
@@ -152,7 +150,7 @@
 
 					if (counter >= modules.length) {
 						if (isFunction(doneCB)) {
-							doneCB.apply(null, moduleList);
+							doneCB.apply(window.Sprocket, moduleList);
 						}
 					}
 				};
@@ -163,7 +161,7 @@
 		} else {
 			doLoad(module, function(module) {
 				if (isFunction(callback)) {
-					callback(module.data);
+					callback.call(window.Sprocket, module.data);
 				}
 			});
 		}
@@ -204,8 +202,8 @@
 
 		if (isArray(dependencies) && dependencies.length > 0) {
 			modules[id].depsLoading = true;
-			this.loadModule(dependencies, function() {
-				modules[id].data = initialize.apply(null, arguments);
+			this.require(dependencies, function() {
+				modules[id].data = initialize.apply(this, arguments);
 
 				modules[id].depsLoading = false;
 				for (var t = 0; t < modules[id].loadingListeners.length; t++) {
@@ -214,6 +212,31 @@
 			});
 		} else {
 			modules[id].data = initialize() || null;
+		}
+	};
+
+	Sprocket.prototype.registerPlugin = function(id, dependencies, initialize) {
+		if (!isString(id)) {
+			console.error('Sprocket: Invalid plugin id.');
+			return;
+		}
+
+		if (!isFunction(initialize)) {
+			console.error('Sprocket: Undefined or invalid plugin function.');
+			return;
+		}
+
+		if (exists(this[id])) {
+			console.error('Sprocket: Namespace \'' + id + '\' already taken.');
+			return;
+		}
+
+		if (isArray(dependencies) && dependencies.length > 0) {
+			this.require(dependencies, function() {
+				this[id] = initialize.apply(this, arguments);
+			});
+		} else {
+			this[id] = initialize();
 		}
 	};
 

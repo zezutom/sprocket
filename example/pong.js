@@ -7,8 +7,6 @@ Sprocket.registerModule('pong', [], function() {
 
 	Sprocket.registerSignals([{ id: 'pong', func: pong }]);
 
-	console.log('Pong: I\'m alive!');
-
 	return {
 		pong: true
 	}

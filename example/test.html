@@ -7,16 +7,16 @@
 	<script src="../Sprocket.js" data-base-dir="../"></script>
 
 	<script>
-	Sprocket.loadModule('pingpong', function() {
-		console.log('PingPong loaded callback');
+	Sprocket.require('pingpong', function(pingpong) {
+		pingpong();
 	});
 
 	Sprocket.registerModule('ponger', ['pingpong'], function(pingpong) {
-		console.log('ponger here');
-		console.log(pingpong);
+		console.log('Ponger lives aswell!');
+		pingpong();
 	});
 
-	Sprocket.loadModule('core/dom', function(dom) {
+	Sprocket.require('core/dom', function(dom) {
 		dom('<div>')
 		.style({
 			backgroundColor: '#9999FF',
@@ -26,6 +26,23 @@
 		})
 		.text('core/dom is working')
 		.appendTo('body');
+	});
+
+	Sprocket.require('core/utils', function() {
+		console.log('Limit: 5 (0-10): ' + Sprocket.utils.limit(5, 0, 10));
+		console.log('Limit: -5 (0-10): ' + Sprocket.utils.limit(-5, 0, 10));
+		console.log('Limit: 15 (0-10): ' + Sprocket.utils.limit(15, 0, 10));
+
+		var list = [1, 2, 3];
+		var obj = {a: 1, b: 2, c: 3};
+		console.log('Each: ', list);
+		Sprocket.utils.each(list, function(k, v) {
+			console.log(k, v);
+		});
+		console.log('Each: ', obj);
+		Sprocket.utils.each(obj, function(k, v) {
+			console.log(k, v);
+		});
 	});
 	</script>
 </head>
