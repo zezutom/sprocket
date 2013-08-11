@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<title>Document</title>
 
-	<script src="../Sprocket.js"></script>
+	<script src="../Sprocket.js" data-base-dir="../"></script>
 
 	<script>
 	Sprocket.loadPlugin('pingpong', function() {
@@ -14,6 +14,18 @@
 	Sprocket.registerPlugin('ponger', ['pingpong'], function(pingpong) {
 		console.log('ponger here');
 		console.log(pingpong);
+	});
+
+	Sprocket.loadPlugin('core/dom', function(dom) {
+		dom('<div>')
+		.style({
+			backgroundColor: '#9999FF',
+			border: '1px solid black',
+			padding: '4px',
+			textAlign: 'center'
+		})
+		.text('core/dom is working')
+		.appendTo('body');
 	});
 	</script>
 </head>

@@ -3,9 +3,16 @@
 
 	var signalsList = {};
 	var plugins = {};
+	var baseDir = '';
 
 	function Sprocket() {
 		console.log('Sprocket vX.XX');
+
+		var currentScript = document.querySelectorAll('script');
+		currentScript = currentScript[currentScript.length - 1];
+		if (exists(currentScript.dataset.baseDir)) {
+			baseDir = currentScript.dataset.baseDir;
+		}
 	};
 
 	// Helpers
@@ -92,16 +99,9 @@
 		var doLoad = function(plugin, callback) {
 			var pluginId, pluginFile;
 
-			if (plugin.search(/\.js$/) > -1) {
-				var matches = plugin.match(/.*\.js$/);
-
-				if (matches) {
-					pluginId = matches.pop();
-					pluginFile = plugin;
-				} else {
-					console.error('Sprocket: Can\'t figure out what file to load for plugin \'' + plugin + '\'.');
-					return;
-				}
+			if (plugin.search(/^core\//) > -1) {
+				pluginId = plugin;
+				pluginFile = baseDir + plugin + '.js';
 			} else {
 				pluginId = plugin;
 				pluginFile = plugin + '.js';
@@ -119,7 +119,7 @@
 			}
 
 			plugins[pluginId] = (function(id, filePath, doneCB) {
-				var head = document.getElementsByTagName('head')[0];
+				var head = document.querySelectorAll('head')[0];
 				var script = document.createElement('script');
 
 				script.addEventListener('load', function() {
