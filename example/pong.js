@@ -7,5 +7,9 @@ Sprocket.registerPlugin('pong', [], function() {
 
 	Sprocket.registerSignals([{ id: 'pong', func: pong }]);
 
-	console.log('Ping: I\'m alive!');
+	console.log('Pong: I\'m alive!');
+
+	return {
+		pong: true
+	}
 });

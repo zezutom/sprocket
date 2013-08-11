@@ -86,7 +86,13 @@
 			}
 
 			if (exists(plugins[pluginId])) {
-				console.error('Sprocket: Can\'t load \'' + pluginId + '\', id taken.');
+				if (plugins[pluginId].loading) {
+					console.error('Sprocket: Can\'t load \'' + pluginId + '\', already loading.');
+					return;
+				}
+				if (exists(callback)) {
+					callback(plugins[pluginId]);
+				}
 				return;
 			}
 
@@ -95,6 +101,7 @@
 				var script = document.createElement('script');
 
 				script.addEventListener('load', function() {
+					plugins[pluginId].loading = false;
 					if (exists(doneCB)) {
 						doneCB(plugins[pluginId]);
 					}
@@ -102,6 +109,11 @@
 				script.src = filePath;
 
 				head.appendChild(script);
+
+				return {
+					loading: true,
+					data: null
+				};
 			}) (pluginId, pluginFile, callback);
 		};
 
@@ -134,7 +146,11 @@
 			return;
 		}
 
-		return plugins[plugin];
+		if (plugins[plugin].loading) {
+			console.warn('Sprocket: Plugin \'' + plugin + '\' is not yet loaded.');
+		}
+
+		return plugins[plugin].data;
 	};
 
 	Sprocket.prototype.registerPlugin = function(id, dependencies, initialize) {
@@ -148,17 +164,17 @@
 			return;
 		}
 
-		if (exists(plugins[id])) {
+		if (exists(plugins[id]) && !plugins[id].loading) {
 			console.error('Sprocket: Namespace \'' + id + '\' already taken.');
 			return;
 		}
 
 		if (isArray(dependencies) && dependencies.length > 0) {
 			this.loadPlugin(dependencies, function() {
-				initialize.apply(null, arguments);
+				plugins[id].data = initialize.apply(null, arguments);
 			});
 		} else {
-			plugins[id] = initialize() || [];
+			plugins[id].data = initialize() || [];
 		}
 	};
 

@@ -7,8 +7,12 @@
 	<script src="../Sprocket.js"></script>
 
 	<script>
-	Sprocket.loadPlugin('pingpong', function(pingpong) {
+	Sprocket.loadPlugin('pingpong', function() {
 		console.log('PingPong loaded callback');
+	});
+
+	Sprocket.registerPlugin('ponger', ['pingpong'], function() {
+		console.log('ponger here');
 	});
 	</script>
 </head>

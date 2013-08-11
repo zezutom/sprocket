@@ -9,4 +9,8 @@ Sprocket.registerPlugin('ping', [], function() {
 	Sprocket.registerSignals([{ id: 'ping', func: ping}]);
 
 	console.log('Ping: I\'m alive!');
+
+	return {
+		ping: true
+	}
 });
