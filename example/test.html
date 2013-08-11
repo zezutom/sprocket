@@ -11,8 +11,9 @@
 		console.log('PingPong loaded callback');
 	});
 
-	Sprocket.registerPlugin('ponger', ['pingpong'], function() {
+	Sprocket.registerPlugin('ponger', ['pingpong'], function(pingpong) {
 		console.log('ponger here');
+		console.log(pingpong);
 	});
 	</script>
 </head>

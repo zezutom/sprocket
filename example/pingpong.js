@@ -1,6 +1,10 @@
-Sprocket.registerPlugin('pingpong', ['ping', 'pong'], function() {
+Sprocket.registerPlugin('pingpong', ['ping', 'pong'], function(ping, pong) {
 	'use strict';
 
-	console.log(arguments);
+	console.log(ping, pong);
 	Sprocket.sendSignal('ping');
+
+	return {
+		pingpong: true
+	};
 });

@@ -25,6 +25,28 @@
 		return (typeof obj !== 'undefined' && obj !== null);
 	}
 
+	function newPlugin(vals) {
+		var data = {
+			loading: false,
+			loadingListeners: [],
+			depsLoading: false,
+			depsLoadingListeners: [],
+			data: null
+		};
+
+		if (exists(vals)) {
+			for (var t in vals) {
+				if (!vals.hasOwnProperty(t)) {
+					continue;
+				}
+
+				data[t] = vals[t];
+			}
+		}
+
+		return data;
+	}
+
 	// Registers a new signal callback. Can take several signals at once.
 	// Expects: [{ id: 'id', func: callback }, etc]
 	Sprocket.prototype.registerSignals = function(signals) {
@@ -87,7 +109,7 @@
 
 			if (exists(plugins[pluginId])) {
 				if (plugins[pluginId].loading) {
-					console.error('Sprocket: Can\'t load \'' + pluginId + '\', already loading.');
+					plugins[pluginId].loadingListeners.push(callback);
 					return;
 				}
 				if (exists(callback)) {
@@ -101,19 +123,22 @@
 				var script = document.createElement('script');
 
 				script.addEventListener('load', function() {
-					plugins[pluginId].loading = false;
-					if (exists(doneCB)) {
-						doneCB(plugins[pluginId]);
+					var plugin = plugins[pluginId];
+					if (!plugin.depsLoading) {
+						plugin.loading = false;
+						for (var t = 0; t < plugin.loadingListeners.length; t++) {
+							plugin.loadingListeners[t](plugin);
+						}
 					}
 				}, true);
 				script.src = filePath;
 
 				head.appendChild(script);
 
-				return {
+				return newPlugin({
 					loading: true,
-					data: null
-				};
+					loadingListeners: exists(doneCB) ? [doneCB] : []
+				});
 			}) (pluginId, pluginFile, callback);
 		};
 
@@ -123,7 +148,7 @@
 				var pluginList = [];
 				var callback = function(plugin) {
 					counter++;
-					pluginList.push(plugin);
+					pluginList.push(plugin.data);
 
 					if (counter >= plugins.length) {
 						if (exists(doneCB)) {
@@ -136,7 +161,9 @@
 				}
 			})(plugin, callback);
 		} else {
-			doLoad(plugin, callback);
+			doLoad(plugin, function(plugin) {
+				callback(plugin.data);
+			});
 		}
 	};
 
@@ -169,12 +196,22 @@
 			return;
 		}
 
+		if (!exists(plugins[id])) {
+			plugins[id] = newPlugin();
+		}
+
 		if (isArray(dependencies) && dependencies.length > 0) {
+			plugins[id].depsLoading = true;
 			this.loadPlugin(dependencies, function() {
 				plugins[id].data = initialize.apply(null, arguments);
+
+				plugins[id].depsLoading = false;
+				for (var t = 0; t < plugins[id].loadingListeners.length; t++) {
+					plugins[id].loadingListeners[t](plugins[id]);
+				}
 			});
 		} else {
-			plugins[id].data = initialize() || [];
+			plugins[id].data = initialize() || null;
 		}
 	};
 
