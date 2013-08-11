@@ -5,7 +5,13 @@
 	<title>Document</title>
 
 	<script src="../Sprocket.js"></script>
-	<script src="pingpong.js"></script>
+
+	<script>
+	Sprocket.loadPlugin('pingpong', function(pingpong) {
+		console.log('omg loaded');
+		console.log(pingpong);
+	});
+	</script>
 </head>
 <body>
 
