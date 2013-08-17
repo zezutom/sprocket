@@ -1,10 +1,32 @@
+/**
+ * Sprocket is a tiny modularization framework.
+ * @type {Object}
+ * @return {} returns nothing
+ * @name Sprocket  
+ * @namespace Sprocket
+ */
 (function() {
 	'use strict';
-
-	var signalsList = {};
+	/** 
+	 * A list of known signals
+	 * @memberof Sprocket 
+	 */
+	var signalsList = {};	
+	/** 
+	 * A list of registered modules
+	 * @memberof Sprocket 
+	 */
 	var modules = {};
+	/** Project's base directory 
+	 * @memberof Sprocket
+	 */
 	var baseDir = '';
 
+	/**
+	 * Initializes base directory
+	 * @constructor
+	 * @memberof Sprocket
+	 */
 	function Sprocket() {
 		console.log('Sprocket vX.XX');
 
@@ -15,19 +37,42 @@
 		}
 	};
 
-	// Helpers
+	/** 
+	 * Verifies if the argument is a string
+	 * @param {Object} obj
+	 * @return {boolean} 
+	 * @memberof Sprocket
+	 */
 	function isString(obj) {
 		return (typeof obj === 'string');
 	}
 
+	/** 
+	 * Verifies if the argument is a function
+	 * @param {Object} obj
+	 * @return {boolean} 
+	 * @memberof Sprocket
+	 */
 	function isFunction(obj) {
 		return (typeof obj === 'function');
 	}
 
+	/** 
+	 * Verifies if the argument is an array
+	 * @param {Object} obj
+	 * @return {boolean} 
+	 * @memberof Sprocket
+	 */
 	function isArray(obj) {
 		return (obj instanceof Array);
 	}
 
+	/** 
+	 * Verifies if the provided object exists
+	 * @param {Object} obj
+	 * @return {boolean} 
+	 * @memberof Sprocket
+	 */
 	function exists(obj) {
 		return (typeof obj !== 'undefined' && obj !== null);
 	}
@@ -54,8 +99,14 @@
 		return data;
 	}
 
-	// Registers a new signal callback. Can take several signals at once.
-	// Expects: [{ id: 'id', func: callback }, etc]
+	/**
+	 * Registers a new signal callback. It can take several signals at once.
+	 * Expects: [{ id: 'id', func: callback }, etc]
+	 *
+	 * @param {Object} signals A map of signals and the corresponding callbacks
+	 * @return {}
+	 * @memberof Sprocket
+	 */
 	Sprocket.prototype.registerSignals = function(signals) {
 		if (!(signals instanceof Array)) {
 			console.error('Sprocket: Expected array!', signals);
@@ -81,7 +132,14 @@
 		});
 	};
 
-	// Sends data to anyone who is listening.
+	/**
+	 * Broadcasts a signal, along with the relevant data, to the registered listeners.
+	 * 
+	 * @param {string} signalId Signal identifier
+	 * @param {Object} data Data related to the broadcasted signal
+	 * @return {}
+	 * @memberof Sprocket
+	 */
 	Sprocket.prototype.sendSignal = function(signalId, data) {
 		if (typeof signalsList[signalId] === 'undefined') {
 			console.warn('Sprocket: No one\'s listening for \'' + signalId + '\'...');
@@ -93,6 +151,14 @@
 		});
 	};
 
+	/**
+	 * Loads the module your own logic depends on. The required module must be defined in a js file having the same name.
+	 * 
+	 * @param {string} module Module name
+	 * @param {Object} callback Module loader
+	 * @return {}
+	 * @memberof Sprocket
+	 */
 	Sprocket.prototype.require = function(module, callback) {
 		var doLoad = function(module, callback) {
 			var moduleId, moduleFile;
@@ -167,6 +233,16 @@
 		}
 	};
 
+	/**
+	 * Calls the module your own logic depends on. The required module must have already been loaded.
+	 *  
+	 * @param {string} module Module name
+	 * @param {Object} callback Module loader
+	 * @return {}
+	 * @throws Exception if the corresponding source file could not be found as <i>baseDir/module.js</i>
+	 * @see Sprocket.require(module, callback)
+	 * @memberof Sprocket
+	 */
 	Sprocket.prototype.requireModule = function(module) {
 		if (!exists(modules[module])) {
 			console.error('Sprocket: module \'' + module + '\' does not exist.');
@@ -180,6 +256,15 @@
 		return modules[module].data;
 	};
 
+	/**
+	 * Registers a new module by providing module id, a list of dependencies and an initializer.
+	 * 
+	 * @param {string} id Module id
+	 * @param {Array} dependencies An array of module identifiers
+	 * @param {Object} initialize Module initializer
+	 * @return {}
+	 * @memberof Sprocket
+	 * */
 	Sprocket.prototype.registerModule = function(id, dependencies, initialize) {
 		if (!isString(id)) {
 			console.error('Sprocket: Invalid module id.');
@@ -215,6 +300,15 @@
 		}
 	};
 
+	/**
+	 * Registers a new plugin by providing module id, a list of dependencies and an initializer.
+	 * 
+	 * @param {string} id Plugin id
+	 * @param {Array} dependencies An array of module identifiers
+	 * @param {Object} initialize Module initializer
+	 * @return {}
+	 * @memberof Sprocket
+	 * */	
 	Sprocket.prototype.registerPlugin = function(id, dependencies, initialize) {
 		if (!isString(id)) {
 			console.error('Sprocket: Invalid plugin id.');
@@ -243,6 +337,6 @@
 	if (typeof window.Sprocket !== 'undefined') {
 		console.error('Sprocket: already defined!!!');
 		return;
-	}
+	}	
 	window.Sprocket = new Sprocket();
 })();
