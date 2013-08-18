@@ -3,29 +3,29 @@
  * @type {Object}
  * @return {} returns nothing
  * @name Sprocket  
- * @namespace Sprocket
+ * @namespace default
  */
 (function() {
 	'use strict';
 	/** 
 	 * A list of known signals
-	 * @memberof Sprocket 
+	 * @memberof default 
 	 */
 	var signalsList = {};	
 	/** 
 	 * A list of registered modules
-	 * @memberof Sprocket 
+	 * @memberof default 
 	 */
 	var modules = {};
 	/** Project's base directory 
-	 * @memberof Sprocket
+	 * @memberof default
 	 */
 	var baseDir = '';
 
 	/**
 	 * Initializes base directory
 	 * @constructor
-	 * @memberof Sprocket
+	 * @memberof default
 	 */
 	function Sprocket() {
 		console.log('Sprocket vX.XX');
@@ -41,7 +41,7 @@
 	 * Verifies if the argument is a string
 	 * @param {Object} obj
 	 * @return {boolean} 
-	 * @memberof Sprocket
+	 * @memberof default
 	 */
 	function isString(obj) {
 		return (typeof obj === 'string');
@@ -51,7 +51,7 @@
 	 * Verifies if the argument is a function
 	 * @param {Object} obj
 	 * @return {boolean} 
-	 * @memberof Sprocket
+	 * @memberof default
 	 */
 	function isFunction(obj) {
 		return (typeof obj === 'function');
@@ -61,7 +61,7 @@
 	 * Verifies if the argument is an array
 	 * @param {Object} obj
 	 * @return {boolean} 
-	 * @memberof Sprocket
+	 * @memberof default
 	 */
 	function isArray(obj) {
 		return (obj instanceof Array);
@@ -71,7 +71,7 @@
 	 * Verifies if the provided object exists
 	 * @param {Object} obj
 	 * @return {boolean} 
-	 * @memberof Sprocket
+	 * @memberof default
 	 */
 	function exists(obj) {
 		return (typeof obj !== 'undefined' && obj !== null);
@@ -105,7 +105,7 @@
 	 *
 	 * @param {Object} signals A map of signals and the corresponding callbacks
 	 * @return {}
-	 * @memberof Sprocket
+	 * @memberof default
 	 */
 	Sprocket.prototype.registerSignals = function(signals) {
 		if (!(signals instanceof Array)) {
@@ -138,7 +138,7 @@
 	 * @param {string} signalId Signal identifier
 	 * @param {Object} data Data related to the broadcasted signal
 	 * @return {}
-	 * @memberof Sprocket
+	 * @memberof default
 	 */
 	Sprocket.prototype.sendSignal = function(signalId, data) {
 		if (typeof signalsList[signalId] === 'undefined') {
@@ -157,7 +157,7 @@
 	 * @param {string} module Module name
 	 * @param {Object} callback Module loader
 	 * @return {}
-	 * @memberof Sprocket
+	 * @memberof default
 	 */
 	Sprocket.prototype.require = function(module, callback) {
 		var doLoad = function(module, callback) {
@@ -241,7 +241,7 @@
 	 * @return {}
 	 * @throws Exception if the corresponding source file could not be found as <i>baseDir/module.js</i>
 	 * @see Sprocket.require(module, callback)
-	 * @memberof Sprocket
+	 * @memberof default
 	 */
 	Sprocket.prototype.requireModule = function(module) {
 		if (!exists(modules[module])) {
@@ -263,8 +263,8 @@
 	 * @param {Array} dependencies An array of module identifiers
 	 * @param {Object} initialize Module initializer
 	 * @return {}
-	 * @memberof Sprocket
-	 * */
+	 * @memberof default
+	 */
 	Sprocket.prototype.registerModule = function(id, dependencies, initialize) {
 		if (!isString(id)) {
 			console.error('Sprocket: Invalid module id.');
@@ -307,8 +307,8 @@
 	 * @param {Array} dependencies An array of module identifiers
 	 * @param {Object} initialize Module initializer
 	 * @return {}
-	 * @memberof Sprocket
-	 * */	
+	 * @memberof default
+	 */	
 	Sprocket.prototype.registerPlugin = function(id, dependencies, initialize) {
 		if (!isString(id)) {
 			console.error('Sprocket: Invalid plugin id.');
